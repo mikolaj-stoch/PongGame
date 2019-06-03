@@ -4,7 +4,6 @@ from gameObjects import Paddle
 from gameObjects import Ball
 from mouse import mouse_check
 from mouse import query_mouse_position
-import turtle
 
 conf_file = open("conf.txt", 'r')
 window_size = file_to_list(conf_file)

@@ -16,11 +16,9 @@ mouse_sensitiveness = 10
 
 def mouse_check(old_x, paddle):
     if old_x - query_mouse_position() > mouse_sensitiveness:
-        print("Left")
         paddle.move_left()
         return query_mouse_position()
     elif old_x - query_mouse_position() < -mouse_sensitiveness:
-        print("Right")
         paddle.move_right()
         return query_mouse_position()
     else:
