@@ -2,6 +2,7 @@ from window import file_to_list
 from window import Window
 from gameObjects import Paddle
 from gameObjects import Ball
+import time
 
 
 # At first we are taking some player preferences - some keyboard inputs to set up game.
@@ -43,9 +44,18 @@ difficulty = difficulty[0]
 print(difficulty)
 conf_file.close()  # Closing file, as we don't need it anymore.
 
+radius = 0.5
+
 # Setting paddles sizes.
 paddle_width_half = 90 / 2
 paddle_height_half = 10 / 2
+if window_size[0] < 200:
+    print("Error - windows size too small. Windows size set to 500 x 500.")
+    window_size[0] = 500
+    window_size[1] = 500
+if window_size[0] != 500:
+    paddle_width_half = paddle_width_half + ( window_size[0] - 500 ) / 10
+    radius = radius + ( window_size[0] - 500) / 1000
 
 
 pause = False  # Pause boolean to manage pause.
@@ -66,9 +76,11 @@ paddle_up = Paddle(paddle_width_half, paddle_height_half)
 paddle_up.set_area(game_window.get_area())
 paddle_up.set_up()
 
+
+
 # Initialization of ball, getting some game elements to ball to optimize code.
 # (I don't want to give every element to update methods, so i will give them once in constructor).
-ball = Ball(paddle_up, paddle_down, game_window.get_area(),score,game_window)
+ball = Ball(paddle_up, paddle_down, game_window.get_area(),score,game_window, radius)
 
 # Resetting score and ball position.
 def reset_score():
@@ -77,6 +89,10 @@ def reset_score():
     score[1] = 0
     game_window.write_scores(score)
     ball.reset()
+    paddle_down.set_on_the_middle()
+    paddle_up.set_on_the_middle()
+    time.sleep(1)
+    
 
 
 def write_pause():
@@ -93,7 +109,7 @@ def write_pause():
 # Method to set keys to be listened to.
 def set_keys():
     global game_window
-    if player_controller == "k": # Only if we are playing with keyboard.
+    if player_controller == "k" or number_of_players == "2": # Only if we are playing with keyboard. Or two players are playing.
         game_window.window.onkeypress(paddle_up.move_left, "Left")
         game_window.window.onkeypress(paddle_up.move_right, "Right")
     game_window.window.onkeypress(ball.set_speed_01, "1") # Speed for every number key.
@@ -164,7 +180,7 @@ def run_game():
     game_window.window.ontimer(run_game, framerate_ms) # Set timer to run method periodically.
 
 
-framerate_ms = 5 # How frequent our function has to be called. In ms.
+framerate_ms = 9 # How frequent our function has to be called. In ms.
 run_game() # Run game.
 game_window.window.mainloop() # Don't close window immediately.
 

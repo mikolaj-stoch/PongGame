@@ -3,7 +3,7 @@ from pynput.mouse import Controller
 import random
 
 class Paddle:
-    speed_of_moving = 9 # Default speed of moving.
+    speed_of_moving = 15 # Default speed of moving.
     margin = 10 # Margin to not to collision with area walls.
 
     def __init__(self, paddle_width_half, paddle_height_half):
@@ -71,12 +71,12 @@ class Paddle:
         if self.cpu_player == True:
             if self.is_hard_difficulty == True:
                 # Computer move great and some + / - accurately when has the same speed of moving like dx of ball.
-                if self.speed_of_moving != abs(ball.dx): # No to change in every induction.
-                    self.speed_of_moving = abs(ball.dx)
+                if self.speed_of_moving != abs(ball.dx) - abs(ball.dx)/4: # No to change in every induction.
+                    self.speed_of_moving = abs(ball.dx) - abs(ball.dx)/4
             else:
-                # Minus one to make bigger error so it will be easier to score.
-                if self.speed_of_moving != abs(ball.dx) - 1:
-                    self.speed_of_moving = abs(ball.dx) - 1
+                # Minus 1/3 of ball speed moving to make bigger error so it will be easier to score.
+                if self.speed_of_moving != abs(ball.dx) - (abs(ball.dx)/2):
+                    self.speed_of_moving = abs(ball.dx) - (abs(ball.dx)/2)
             # If ball is moving to left, move paddle to left. Vice versa to right.
             if ball.dx < 0:
                 self.move_left()
@@ -90,24 +90,27 @@ class Paddle:
     def mouse_playing(self):
         if self.mouse_player == True:
             # When mouse position is changed by ten, make move.
-            if self.mouse.position[0] - self.x_mouse > 10:
+            if self.mouse.position[0] - self.x_mouse > 20:
                 self.move_right()
                 self.x_mouse = self.mouse.position[0] # Assign mouse position to be held in x_mouse in integer.
-            elif self.mouse.position[0] - self.x_mouse < -10:
+            elif self.mouse.position[0] - self.x_mouse < -20:
                 self.move_left()
                 self.x_mouse = self.mouse.position[0]
+
+    def set_on_the_middle(self):
+        self.paddle.setx(0)
 
 
 class Ball:
     dx = 3
     dy = dx
 
-    def __init__(self, paddle_up, paddle_down, area, score, window):
+    def __init__(self, paddle_up, paddle_down, area, score, window, radius):
         self.ball = Turtle()
         self.ball.speed(0)
         self.ball.shape("circle") # Shape.
-        self.ball.shapesize(0.5, 0.5)
-        self.ball_radius = 10 * 0.5 # Radius of our ball.
+        self.ball.shapesize(radius, radius)
+        self.ball_radius = 10 * radius # Radius of our ball.
         self.ball.color("black")
         self.ball.penup()
         self.ball.goto(0, 0)
@@ -223,7 +226,7 @@ class Ball:
         if self.ball_collision_with_paddle(self.paddle_up) or self.ball_collision_with_paddle(self.paddle_down):
             self.dy = self.dy * -1
             # Change randomly x vector to diversity and make less predictable game.
-            if random.randint(1,2) == 1:
+            if random.randint(1,4) == 4:
                 self.dx = self.dx * -1
 
     def check_if_score(self):
@@ -241,6 +244,8 @@ class Ball:
         coordinates = paddle.get_coordinates() # Get paddle coordinates.
         # Detection of the collision. Taking ball as square. Not perfect, but works quite good.
         # When paddle position minus ball posistion is smaller than radius with paddle size.
+        # Check if distance beetwen center of the ball and paddle is smaller than radius andle paddle width / height.
+        # If, yes there is a collision.
         collision_horizontal = self.ball_radius + paddle.paddle_width_half >= abs(coordinates[0] - self.ball.xcor())
         collision_vertical = self.ball_radius + paddle.paddle_height_half >= abs(coordinates[1] - self.ball.ycor())
         return collision_horizontal and collision_vertical

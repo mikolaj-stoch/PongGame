@@ -1,4 +1,4 @@
-Window Size: 500 x 500
-Numbers of players: 1
+Window Size: 50 x 60
+Numbers of players: 2
 Player controller: m
-Difficulty: 1
+Difficulty: 2
